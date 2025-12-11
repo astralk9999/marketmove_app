@@ -22,9 +22,9 @@ MarketMove es una aplicación móvil desarrollada en Flutter que permite a los p
 
 | Rol | Nombre |
 |-----|--------|
-| Desarrollador Principal | [Tu nombre] |
-| Diseño UX/UI | [Nombre] |
-| Backend/Supabase | [Nombre] |
+| Desarrollador Principal | [Koldo_Uruburu] |
+| Diseño UX/UI | [Koldo_Uruburu] |
+| Backend/Supabase | [Koldo_Uruburu] |
 
 ---
 
