@@ -172,7 +172,7 @@ class _ResumenScreenState extends State<ResumenScreen> {
                                 Text(
                                   '$_productosStockBajo productos necesitan reposición',
                                   style: TextStyle(
-                                    color: AppTheme.textSecondary,
+                                    color: AppTheme.getTextSecondary(context),
                                     fontSize: 13,
                                   ),
                                 ),
@@ -321,12 +321,14 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.getCardColor(context),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        boxShadow: isDark ? null : [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
@@ -342,7 +344,7 @@ class _StatCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -353,23 +355,24 @@ class _StatCard extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              color: AppTheme.textSecondary,
+              color: AppTheme.getTextSecondary(context),
               fontSize: 12,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
+              color: AppTheme.getTextPrimary(context),
             ),
           ),
           const SizedBox(height: 2),
           Text(
             subtitle,
             style: TextStyle(
-              color: AppTheme.textSecondary,
+              color: AppTheme.getTextSecondary(context),
               fontSize: 11,
             ),
           ),

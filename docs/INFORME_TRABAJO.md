@@ -1,14 +1,14 @@
 # INFORME DE TRABAJO SEMANAL
 
 ## Proyecto: MarketMove App
-**Semana:** 1  
+**Semana:** 1-2  
 **Fecha:** Diciembre 2024
 
 ---
 
 ## 1. RESUMEN EJECUTIVO
 
-Durante esta semana se ha completado el desarrollo inicial del proyecto MarketMove App, una aplicación móvil en Flutter para la gestión de pequeños comercios. Se ha establecido la arquitectura base, implementado las pantallas principales y configurado la integración con Supabase.
+Durante estas semanas se ha completado el desarrollo del proyecto MarketMove App, una aplicación móvil en Flutter para la gestión de pequeños comercios. Se ha establecido la arquitectura base, implementado las pantallas principales, configurado la integración con Supabase, y añadido mejoras visuales con soporte para tema claro/oscuro.
 
 ---
 
@@ -17,7 +17,7 @@ Durante esta semana se ha completado el desarrollo inicial del proyecto MarketMo
 ### 2.1 Análisis y Planificación (4 horas)
 - ✅ Análisis de requisitos del cliente MarketMove S.L.
 - ✅ Definición de funcionalidades principales
-- ✅ Diseño del sistema de roles (user, staff, admin, super_admin)
+- ✅ Sistema de usuarios simplificado (rol único: staff)
 - ✅ Planificación de sprints y entregables
 
 ### 2.2 Arquitectura del Proyecto (6 horas)
@@ -38,28 +38,36 @@ lib/src/
 
 | Pantalla | Estado | Descripción |
 |----------|--------|-------------|
-| PricingScreen | ✅ | Tabla de precios pública con 3 planes Stripe |
-| LoginScreen | ✅ | Inicio de sesión con validación |
-| RegisterScreen | ✅ | Registro de nuevos usuarios |
-| HomeScreen | ✅ | Navegación principal con bottom bar |
-| ResumenScreen | ✅ | Dashboard con balance y estadísticas |
+| LoginScreen | ✅ | Inicio de sesión con animaciones y diseño moderno |
+| RegisterScreen | ✅ | Registro con verificación de email |
+| HomeScreen | ✅ | Navegación con bottom bar animada y toggle de tema |
+| ResumenScreen | ✅ | Dashboard con balance, estadísticas y acciones rápidas |
 | VentasScreen | ✅ | Lista y registro de ventas |
 | GastosScreen | ✅ | Lista y registro de gastos por categoría |
 | ProductosScreen | ✅ | Gestión de inventario y stock |
-| AdminPanelScreen | ✅ | Panel de administración de usuarios |
 
 ### 2.4 Backend e Integración (16 horas)
 - ✅ Configuración de Supabase
 - ✅ Esquema de base de datos (`database/schema.sql`)
 - ✅ Servicios de conexión (SupabaseService, VentasService, etc.)
-- ✅ Sistema de autenticación con roles
+- ✅ Sistema de autenticación con verificación de email
 - ✅ Row Level Security (RLS) policies
+- ✅ Plantillas de email personalizadas
 
-### 2.5 Documentación (6 horas)
-- ✅ README.md profesional
-- ✅ Documento de presupuesto (`docs/PRESUPUESTO.md`)
+### 2.5 Mejoras Visuales (8 horas)
+- ✅ Sistema de tema claro/oscuro con ThemeProvider
+- ✅ Persistencia de preferencias de tema
+- ✅ Gradientes y colores modernos
+- ✅ Animaciones de entrada y transiciones
+- ✅ Widgets de carga personalizados
+- ✅ Diseño responsive adaptado a ambos temas
+
+### 2.6 Documentación (6 horas)
+- ✅ README.md profesional actualizado
+- ✅ Documento de presupuesto (`docs/PRESUPUESTO_MARKETMOVE.md`)
 - ✅ Este informe de trabajo
 - ✅ Esquema SQL documentado
+- ✅ Plantillas de email (`database/email_templates.html`)
 
 ---
 
@@ -74,6 +82,7 @@ lib/src/
 | Supabase | 2.8.0 | Backend as a Service con PostgreSQL |
 | Provider | 6.1.2 | Gestión de estado simple y eficaz |
 | GoRouter | 14.6.0 | Navegación declarativa |
+| SharedPreferences | 2.3.3 | Persistencia local del tema |
 
 ### 3.2 Arquitectura
 
@@ -83,21 +92,19 @@ Se implementó una arquitectura basada en **features** para facilitar:
 - Testing aislado por funcionalidad
 - Reutilización de componentes compartidos
 
-### 3.3 Sistema de Roles
+### 3.3 Sistema de Usuarios
 
-| Rol | Nivel | Permisos |
-|-----|-------|----------|
-| super_admin | 4 | Control total, gestiona admins |
-| admin | 3 | Gestiona productos, staff y usuarios |
-| staff | 2 | Gestiona usuarios básicos |
-| user | 1 | Solo su propio comercio |
+Sistema simplificado con rol único **staff**:
+- Todos los usuarios tienen acceso completo a su comercio
+- Gestión de ventas, gastos y productos
+- Verificación por email obligatoria
 
-### 3.4 Integración Stripe
+### 3.4 Sistema de Temas
 
-Se implementaron 3 planes de pago con enlaces directos a Stripe Checkout:
-- **Plan Básico:** €9.99/mes
-- **Plan Anual:** €99.99/año (ahorro 17%)
-- **Licencia Definitiva:** €199.99 (pago único)
+Se implementó un sistema completo de temas:
+- **ThemeProvider**: Gestiona el estado del tema
+- **Persistencia**: SharedPreferences guarda la preferencia
+- **Colores dinámicos**: Adaptación automática de todos los componentes
 
 ---
 
@@ -109,61 +116,63 @@ Se implementaron 3 planes de pago con enlaces directos a Stripe Checkout:
 | Arquitectura | 6 h | 6 h |
 | Desarrollo Frontend | 40 h | 40 h |
 | Integración Backend | 16 h | 16 h |
+| Mejoras Visuales | 8 h | 8 h |
 | Documentación | 6 h | 6 h |
-| **TOTAL** | **72 h** | **72 h** |
+| **TOTAL** | **80 h** | **80 h** |
 
 ---
 
-## 5. ARCHIVOS CREADOS
+## 5. ARCHIVOS CREADOS/MODIFICADOS
 
 ### Core
 - `lib/src/core/constants/app_constants.dart`
-- `lib/src/core/theme/app_theme.dart`
+- `lib/src/core/theme/app_theme.dart` (tema claro/oscuro completo)
 - `lib/src/core/routes/app_router.dart`
 
 ### Features
-- `lib/src/features/auth/screens/login_screen.dart`
+- `lib/src/features/auth/screens/login_screen.dart` (rediseñado)
 - `lib/src/features/auth/screens/register_screen.dart`
-- `lib/src/features/pricing/screens/pricing_screen.dart`
 - `lib/src/features/ventas/screens/ventas_screen.dart`
 - `lib/src/features/ventas/models/venta_model.dart`
 - `lib/src/features/gastos/screens/gastos_screen.dart`
 - `lib/src/features/gastos/models/gasto_model.dart`
 - `lib/src/features/productos/screens/productos_screen.dart`
 - `lib/src/features/productos/models/producto_model.dart`
-- `lib/src/features/resumen/screens/home_screen.dart`
-- `lib/src/features/resumen/screens/resumen_screen.dart`
-- `lib/src/features/admin/screens/admin_panel_screen.dart`
+- `lib/src/features/resumen/screens/home_screen.dart` (rediseñado)
+- `lib/src/features/resumen/screens/resumen_screen.dart` (adaptado tema)
 
 ### Shared
-- `lib/src/shared/models/user_model.dart`
+- `lib/src/shared/models/user_model.dart` (simplificado)
 - `lib/src/shared/services/supabase_service.dart`
 - `lib/src/shared/services/ventas_service.dart`
 - `lib/src/shared/services/gastos_service.dart`
 - `lib/src/shared/services/productos_service.dart`
 - `lib/src/shared/providers/auth_provider.dart`
+- `lib/src/shared/providers/theme_provider.dart` (nuevo)
+- `lib/src/shared/widgets/loading_widget.dart` (nuevo)
 
 ### Otros
-- `lib/main.dart`
-- `database/schema.sql`
-- `docs/PRESUPUESTO.md`
+- `lib/main.dart` (integra ThemeProvider)
+- `database/schema.sql` (actualizado)
+- `database/email_templates.html` (nuevo)
+- `docs/PRESUPUESTO_MARKETMOVE.md`
 - `docs/INFORME_TRABAJO.md`
-- `README.md`
+- `README.md` (actualizado)
 
 ---
 
 ## 6. PRÓXIMOS PASOS
 
-### Semana 2
+### Pendiente
 - [ ] Implementar gráficos con fl_chart
-- [ ] Añadir exportación de datos a PDF
 - [ ] Testing unitario y de integración
 - [ ] Pruebas de usuario
-
-### Pendiente
 - [ ] Publicación en tiendas (mock)
+
+### Opcional
+- [ ] Añadir exportación de datos a PDF
 - [ ] Configuración de notificaciones push
-- [ ] Modo offline (opcional)
+- [ ] Modo offline
 
 ---
 
@@ -172,21 +181,24 @@ Se implementaron 3 planes de pago con enlaces directos a Stripe Checkout:
 | Problema | Solución |
 |----------|----------|
 | Estructura de carpetas compleja | Se siguió el patrón de features para modularizar |
-| Sistema de roles multinivel | Se implementó helper en UserRoles con niveles numéricos |
-| Acceso público a pricing | PricingScreen no requiere autenticación |
+| Cards blancas en modo oscuro | Se implementaron colores dinámicos con getCardColor() |
+| Signup no creaba usuarios | Se corrigió esquema SQL y triggers en Supabase |
+| Verificación de email | Se configuró Supabase con plantillas personalizadas |
 
 ---
 
 ## 8. CONCLUSIONES
 
-El proyecto MarketMove App ha avanzado según lo planificado. Se ha completado:
+El proyecto MarketMove App ha sido completado con éxito. Se ha implementado:
 - ✅ Arquitectura sólida y escalable
-- ✅ Pantallas funcionales (MVP)
-- ✅ Sistema de autenticación con roles
-- ✅ Integración con Supabase preparada
-- ✅ Documentación profesional
+- ✅ Pantallas funcionales con diseño moderno
+- ✅ Sistema de autenticación con verificación de email
+- ✅ Integración completa con Supabase
+- ✅ Tema claro/oscuro con persistencia
+- ✅ Animaciones y mejoras visuales
+- ✅ Documentación profesional actualizada
 
-El proyecto está listo para las fases de pruebas y refinamiento.
+El proyecto está listo para pruebas finales y entrega.
 
 ---
 

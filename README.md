@@ -14,7 +14,8 @@ MarketMove es una aplicación móvil desarrollada en Flutter que permite a los p
 - **Controlar gastos** por categorías
 - **Gestionar inventario** con alertas de stock bajo
 - **Visualizar balance** de ganancias vs gastos en tiempo real
-- **Sistema de roles** para gestión de usuarios (Usuario, Staff, Admin, Super Admin)
+- **Tema claro/oscuro** con persistencia de preferencias
+- **Verificación por email** para nuevos usuarios
 
 ---
 
@@ -42,14 +43,13 @@ dependencies:
   supabase_flutter: ^2.8.0    # Backend y autenticación
   provider: ^6.1.2             # Gestión de estado
   go_router: ^14.6.0           # Navegación
-  url_launcher: ^6.3.1         # Abrir URLs (Stripe)
   intl: ^0.19.0                # Formato de fechas y monedas
+  shared_preferences: ^2.3.3   # Persistencia local (tema)
   fl_chart: ^0.69.2            # Gráficos
 ```
 
 ### Backend
-- **Supabase** - Base de datos PostgreSQL + Autenticación
-- **Stripe** - Procesamiento de pagos
+- **Supabase** - Base de datos PostgreSQL + Autenticación + Email verification
 
 ---
 
@@ -76,7 +76,10 @@ static const String supabaseAnonKey = 'TU_ANON_KEY';
 ### 4. Ejecutar la base de datos
 Ejecutar el script `database/schema.sql` en tu proyecto de Supabase.
 
-### 5. Ejecutar la aplicación
+### 5. Configurar verificación de email (opcional)
+Ver plantillas en `database/email_templates.html` para personalizar emails de Supabase.
+
+### 6. Ejecutar la aplicación
 ```bash
 flutter run
 ```
@@ -89,8 +92,8 @@ flutter run
 lib/
   src/
     core/
-      constants/      # Constantes de la app (URLs, precios)
-      theme/          # Tema visual de la aplicación
+      constants/      # Constantes de la app (URLs)
+      theme/          # Tema visual (claro/oscuro)
       routes/         # Configuración de navegación
     features/
       auth/           # Autenticación (login, registro)
@@ -98,19 +101,33 @@ lib/
       gastos/         # Módulo de gastos
       productos/      # Módulo de productos/stock
       resumen/        # Dashboard y resumen
-      pricing/        # Pantalla de precios (pública)
-      admin/          # Panel de administración
     shared/
-      widgets/        # Componentes reutilizables
+      widgets/        # Componentes reutilizables (loading, buttons)
       models/         # Modelos de datos
       services/       # Servicios (Supabase, API)
-      providers/      # Providers de estado
-assets/
-  images/             # Imágenes de la app
-  icons/              # Iconos personalizados
+      providers/      # Providers de estado (auth, theme)
 database/
   schema.sql          # Esquema de base de datos
+  email_templates.html # Plantillas de email para Supabase
 ```
+
+---
+
+## 🎨 Características Visuales
+
+### Tema Claro/Oscuro
+- Cambio de tema con un botón en la AppBar
+- Persistencia del tema seleccionado
+- Colores modernos con gradientes
+- Animaciones suaves en transiciones
+
+### Colores Principales
+| Elemento | Color Claro | Color Oscuro |
+|----------|-------------|--------------|
+| Primario | #6366F1 (Índigo) | #818CF8 |
+| Secundario | #8B5CF6 (Violeta) | #A78BFA |
+| Éxito | #10B981 (Verde) | #34D399 |
+| Error | #EF4444 (Rojo) | #F87171 |
 
 ---
 
@@ -123,30 +140,30 @@ database/
 | 3. Arquitectura | Estructura de carpetas y servicios | ✅ Completado |
 | 4. Frontend | Desarrollo de pantallas en Flutter | ✅ Completado |
 | 5. Backend | Integración con Supabase | ✅ Completado |
-| 6. Pruebas | Testing funcional | 🔄 En progreso |
+| 6. Mejoras UI | Tema oscuro, animaciones, gradientes | ✅ Completado |
 | 7. Documentación | README y presupuesto | ✅ Completado |
 | 8. Entrega | Publicación (mock) | ⏳ Pendiente |
 
 ---
 
-## 💰 Planes de Precios
+## � Sistema de Usuarios
 
-| Plan | Precio | Enlace |
-|------|--------|--------|
-| **Básico** | €9.99/mes | [Suscribirse](https://buy.stripe.com/test_9B6cMY6Oz9rqbYTcco08g00) |
-| **Anual** | €99.99/año | [Suscribirse](https://buy.stripe.com/test_5kQ14g1uf476fb51xK08g02) |
-| **Licencia Definitiva** | €199.99 (único) | [Comprar](https://buy.stripe.com/test_eVq14g7SD7ji6EzgsE08g01) |
+Todos los usuarios registrados tienen rol **staff** con acceso completo a:
+- Gestión de ventas
+- Gestión de gastos
+- Gestión de productos e inventario
+- Dashboard con balance y estadísticas
 
 ---
 
-## 🔐 Sistema de Roles
+## � Verificación de Email
 
-| Rol | Permisos |
-|-----|----------|
-| **Super Admin** | Control total del sistema, gestión de admins |
-| **Admin** | Gestiona productos, staff y usuarios |
-| **Staff** | Gestiona usuarios básicos |
-| **Usuario** | Acceso a funciones de su comercio |
+La aplicación utiliza verificación de email mediante Supabase:
+1. El usuario se registra con email y contraseña
+2. Recibe un correo de confirmación
+3. Al confirmar, puede acceder a la app
+
+Las plantillas de email personalizadas están en `database/email_templates.html`.
 
 ---
 

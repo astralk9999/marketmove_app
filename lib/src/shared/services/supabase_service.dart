@@ -21,16 +21,13 @@ class SupabaseService {
     required String email,
     required String password,
     required String fullName,
-    String role = 'user',
-    String? planType,
   }) async {
     final response = await client.auth.signUp(
       email: email,
       password: password,
       data: {
         'full_name': fullName,
-        'role': role,
-        'plan_type': planType,
+        'role': 'staff',
       },
     );
     return response;
@@ -90,13 +87,4 @@ class SupabaseService {
         .eq('id', userId);
   }
 
-  static Future<void> updateUserPlan(String userId, String planType, DateTime? expiresAt) async {
-    await client
-        .from('profiles')
-        .update({
-          'plan_type': planType,
-          'plan_expires_at': expiresAt?.toIso8601String(),
-        })
-        .eq('id', userId);
-  }
 }

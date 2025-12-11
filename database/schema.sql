@@ -15,9 +15,7 @@ CREATE TABLE IF NOT EXISTS profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT,
     full_name TEXT NOT NULL,
-    role TEXT CHECK (role IN ('user', 'staff', 'admin', 'super_admin')) DEFAULT 'user',
-    plan_type TEXT CHECK (plan_type IN ('basic', 'annual', 'lifetime')) DEFAULT NULL,
-    plan_expires_at TIMESTAMPTZ DEFAULT NULL,
+    role TEXT CHECK (role IN ('staff')) DEFAULT 'staff',
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -65,6 +63,16 @@ CREATE TABLE IF NOT EXISTS gastos (
 -- ÍNDICES PARA MEJORAR PERFORMANCE
 -- ==============================================
 
+DROP INDEX IF EXISTS idx_ventas_user_id;
+DROP INDEX IF EXISTS idx_ventas_fecha;
+DROP INDEX IF EXISTS idx_gastos_user_id;
+DROP INDEX IF EXISTS idx_gastos_fecha;
+DROP INDEX IF EXISTS idx_gastos_categoria;
+DROP INDEX IF EXISTS idx_productos_user_id;
+DROP INDEX IF EXISTS idx_productos_nombre;
+DROP INDEX IF EXISTS idx_productos_categoria;
+DROP INDEX IF EXISTS idx_profiles_role;
+
 CREATE INDEX idx_ventas_user_id ON ventas(user_id);
 CREATE INDEX idx_ventas_fecha ON ventas(fecha);
 CREATE INDEX idx_gastos_user_id ON gastos(user_id);
@@ -74,7 +82,6 @@ CREATE INDEX idx_productos_user_id ON productos(user_id);
 CREATE INDEX idx_productos_nombre ON productos(nombre);
 CREATE INDEX idx_productos_categoria ON productos(categoria);
 CREATE INDEX idx_profiles_role ON profiles(role);
-CREATE INDEX idx_profiles_plan_type ON profiles(plan_type);
 
 -- ==============================================
 -- ROW LEVEL SECURITY (RLS)
@@ -90,126 +97,84 @@ ALTER TABLE productos ENABLE ROW LEVEL SECURITY;
 -- POLÍTICAS DE SEGURIDAD - PROFILES
 -- ==============================================
 
--- Los usuarios pueden ver su propio perfil
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+DROP POLICY IF EXISTS "Staff and above can view all profiles" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
+DROP POLICY IF EXISTS "Staff can update user roles" ON profiles;
+DROP POLICY IF EXISTS "Super admin full access" ON profiles;
+
 CREATE POLICY "Users can view own profile" ON profiles
-    FOR SELECT
-    USING (auth.uid() = id);
+    FOR SELECT USING (auth.uid() = id);
 
--- Staff, Admin y Super Admin pueden ver todos los perfiles
-CREATE POLICY "Staff and above can view all profiles" ON profiles
-    FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE id = auth.uid() 
-            AND role IN ('staff', 'admin', 'super_admin')
-        )
-    );
-
--- Los usuarios pueden actualizar su propio perfil (excepto el rol)
 CREATE POLICY "Users can update own profile" ON profiles
-    FOR UPDATE
-    USING (auth.uid() = id)
-    WITH CHECK (auth.uid() = id);
+    FOR UPDATE USING (auth.uid() = id);
 
--- Los usuarios pueden insertar su propio perfil
 CREATE POLICY "Users can insert own profile" ON profiles
-    FOR INSERT
-    WITH CHECK (auth.uid() = id);
-
--- Staff puede actualizar roles de usuarios
-CREATE POLICY "Staff can update user roles" ON profiles
-    FOR UPDATE
-    USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE id = auth.uid() 
-            AND role IN ('staff', 'admin', 'super_admin')
-        )
-    );
-
--- Super Admin puede hacer todo
-CREATE POLICY "Super admin full access" ON profiles
-    FOR ALL
-    USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE id = auth.uid() 
-            AND role = 'super_admin'
-        )
-    );
+    FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- ==============================================
 -- POLÍTICAS DE SEGURIDAD - VENTAS
 -- ==============================================
 
--- Usuarios pueden ver sus propias ventas
+DROP POLICY IF EXISTS "Users can view own ventas" ON ventas;
+DROP POLICY IF EXISTS "Users can create own ventas" ON ventas;
+DROP POLICY IF EXISTS "Users can update own ventas" ON ventas;
+DROP POLICY IF EXISTS "Users can delete own ventas" ON ventas;
+
 CREATE POLICY "Users can view own ventas" ON ventas
-    FOR SELECT
-    USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid() = user_id);
 
--- Usuarios pueden crear sus propias ventas
 CREATE POLICY "Users can create own ventas" ON ventas
-    FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Usuarios pueden actualizar sus propias ventas
 CREATE POLICY "Users can update own ventas" ON ventas
-    FOR UPDATE
-    USING (auth.uid() = user_id);
+    FOR UPDATE USING (auth.uid() = user_id);
 
--- Usuarios pueden eliminar sus propias ventas
 CREATE POLICY "Users can delete own ventas" ON ventas
-    FOR DELETE
-    USING (auth.uid() = user_id);
+    FOR DELETE USING (auth.uid() = user_id);
 
 -- ==============================================
 -- POLÍTICAS DE SEGURIDAD - GASTOS
 -- ==============================================
 
--- Usuarios pueden ver sus propios gastos
+DROP POLICY IF EXISTS "Users can view own gastos" ON gastos;
+DROP POLICY IF EXISTS "Users can create own gastos" ON gastos;
+DROP POLICY IF EXISTS "Users can update own gastos" ON gastos;
+DROP POLICY IF EXISTS "Users can delete own gastos" ON gastos;
+
 CREATE POLICY "Users can view own gastos" ON gastos
-    FOR SELECT
-    USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid() = user_id);
 
--- Usuarios pueden crear sus propios gastos
 CREATE POLICY "Users can create own gastos" ON gastos
-    FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Usuarios pueden actualizar sus propios gastos
 CREATE POLICY "Users can update own gastos" ON gastos
-    FOR UPDATE
-    USING (auth.uid() = user_id);
+    FOR UPDATE USING (auth.uid() = user_id);
 
--- Usuarios pueden eliminar sus propios gastos
 CREATE POLICY "Users can delete own gastos" ON gastos
-    FOR DELETE
-    USING (auth.uid() = user_id);
+    FOR DELETE USING (auth.uid() = user_id);
 
 -- ==============================================
 -- POLÍTICAS DE SEGURIDAD - PRODUCTOS
 -- ==============================================
 
--- Usuarios pueden ver sus propios productos
+DROP POLICY IF EXISTS "Users can view own productos" ON productos;
+DROP POLICY IF EXISTS "Users can create own productos" ON productos;
+DROP POLICY IF EXISTS "Users can update own productos" ON productos;
+DROP POLICY IF EXISTS "Users can delete own productos" ON productos;
+
 CREATE POLICY "Users can view own productos" ON productos
-    FOR SELECT
-    USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid() = user_id);
 
--- Usuarios pueden crear sus propios productos
 CREATE POLICY "Users can create own productos" ON productos
-    FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Usuarios pueden actualizar sus propios productos
 CREATE POLICY "Users can update own productos" ON productos
-    FOR UPDATE
-    USING (auth.uid() = user_id);
+    FOR UPDATE USING (auth.uid() = user_id);
 
--- Usuarios pueden eliminar sus propios productos
 CREATE POLICY "Users can delete own productos" ON productos
-    FOR DELETE
-    USING (auth.uid() = user_id);
+    FOR DELETE USING (auth.uid() = user_id);
 
 -- ==============================================
 -- FUNCIONES Y TRIGGERS
@@ -219,13 +184,12 @@ CREATE POLICY "Users can delete own productos" ON productos
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-    INSERT INTO public.profiles (id, email, full_name, role, plan_type)
+    INSERT INTO public.profiles (id, email, full_name, role)
     VALUES (
         new.id,
         new.email,
         COALESCE(new.raw_user_meta_data->>'full_name', 'Usuario'),
-        COALESCE(new.raw_user_meta_data->>'role', 'user'),
-        new.raw_user_meta_data->>'plan_type'
+        'staff'
     );
     RETURN new;
 END;
@@ -253,6 +217,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger para actualizar stock al crear venta
+DROP TRIGGER IF EXISTS on_venta_created ON ventas;
 CREATE TRIGGER on_venta_created
     AFTER INSERT ON ventas
     FOR EACH ROW
@@ -268,7 +233,6 @@ SELECT
     p.id as user_id,
     p.full_name,
     p.role,
-    p.plan_type,
     COALESCE((SELECT SUM(total) FROM ventas WHERE user_id = p.id), 0) as total_ventas,
     COALESCE((SELECT SUM(monto) FROM gastos WHERE user_id = p.id), 0) as total_gastos,
     COALESCE((SELECT COUNT(*) FROM productos WHERE user_id = p.id), 0) as total_productos,
